@@ -2,7 +2,7 @@
 Online Shopping with Java
 by :
 + Cut Dahliana (22081070100
-+ M. Ihsan Rizqullah Adfa (22081070100
++ M. Ihsan Rizqullah Adfa (2208107010029)
 + Muhammad Ilzam (2208107010087)
 
 1. Pada sistem memiliki sebuah fitur login, yang mana pengguna harus login terlebih dahulu
