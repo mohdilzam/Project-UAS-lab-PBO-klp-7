@@ -1,26 +1,50 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Kelas yang merepresentasikan akun pengguna.
+ */
 class Akun {
     private String id;
-
+    
+    /**
+     * Konstruktor untuk membuat objek Akun.
+     *
+     * @param id ID akun.
+     */
     public Akun(String id) {
         this.id = id;
     }
 
+    /**
+     * Mendapatkan ID akun.
+     *
+     * @return ID akun.
+     */
     public String getId() {
         return id;
     }
 }
 
+//Interface Driver yang menentukan metode login.
 interface Driver {
     void login();
 }
 
+/**
+ * Kelas AdminDriver yang mengimplementasikan interface Driver.
+ * Digunakan oleh admin untuk mengelola barang di sistem.
+ */
 class AdminDriver implements Driver {
     private Akun akun;
     private ListBarang listBarang;
 
+    /**
+     * Konstruktor untuk membuat objek AdminDriver.
+     *
+     * @param akun       Objek Akun admin.
+     * @param listBarang Objek ListBarang yang berisi daftar barang.
+     */
     public AdminDriver(Akun akun, ListBarang listBarang) {
         this.akun = akun;
         this.listBarang = listBarang;
@@ -31,6 +55,7 @@ class AdminDriver implements Driver {
         System.out.println("Admin " + akun.getId() + " login.");
     }
 
+    //Menampilkan daftar barang.
     public void lihatBarang() {
         System.out.println("\nList Barang:");
         for (Barang barang : listBarang.getBarang()) {
@@ -38,6 +63,7 @@ class AdminDriver implements Driver {
         }
     }
 
+    //Menu untuk mengelola barang (tambah, hapus, edit).
     public void kelolaBarang() {
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
@@ -69,6 +95,7 @@ class AdminDriver implements Driver {
         }
     }
 
+    //menambah barang ke daftar
     private void tambahBarang() {
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.print("Masukkan ID barang: ");
@@ -84,6 +111,7 @@ class AdminDriver implements Driver {
         }
     }
 
+    //Menghapus barang dari daftar
     private void hapusBarang() {
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.print("Masukkan ID barang yang akan dihapus: ");
@@ -98,6 +126,7 @@ class AdminDriver implements Driver {
         }
     }
 
+    //Mengedit barang di daftar
     private void editBarang() {
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.print("Masukkan ID barang yang akan diedit: ");
@@ -120,6 +149,10 @@ class AdminDriver implements Driver {
     }
 }
 
+/**
+ * Kelas CustomerDriver yang mengimplementasikan interface Driver.
+ * Digunakan oleh customer untuk melakukan pembelian barang.
+ */
 class CustomerDriver implements Driver {
     private Akun akun;
     private Keranjang keranjang;
@@ -127,6 +160,12 @@ class CustomerDriver implements Driver {
     private ListBarang listBarang;
     private ArrayList<Transaksi> historyBelanja;
 
+    /**
+     * Konstruktor untuk membuat objek CustomerDriver.
+     *
+     * @param akun       Objek Akun customer.
+     * @param listBarang Objek ListBarang yang berisi daftar barang.
+     */
     public CustomerDriver(Akun akun, ListBarang listBarang) {
         this.akun = akun;
         this.keranjang = new Keranjang();
@@ -140,6 +179,7 @@ class CustomerDriver implements Driver {
         System.out.println("Customer " + akun.getId() + " login.");
     }
 
+    //Menampilkan daftar barang
     public void lihatBarang() {
         System.out.println("\nList Barang:");
         for (Barang barang : listBarang.getBarang()) {
@@ -147,6 +187,7 @@ class CustomerDriver implements Driver {
         }
     }
 
+    //Menu untuk mengelola keranjang (tambah, hapus, lihat, checkout)
     public void kelolaKeranjang() {
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
@@ -178,6 +219,7 @@ class CustomerDriver implements Driver {
         }
     }
 
+    //Menambahkan barang ke keranjang
     private void tambahKeKeranjang() {
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.print("Masukkan ID barang yang akan ditambahkan ke keranjang: ");
@@ -193,6 +235,7 @@ class CustomerDriver implements Driver {
         }
     }
 
+    //Menghapus barang dari keranjang
     private void hapusDariKeranjang() {
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.print("Masukkan ID barang yang akan dihapus dari keranjang: ");
@@ -207,6 +250,7 @@ class CustomerDriver implements Driver {
         }
     }
 
+    //Menampilkan isi keranjang
     private void lihatKeranjang() {
         System.out.println("\nIsi Keranjang:");
         for (Barang barang : keranjang.getBarang()) {
@@ -214,6 +258,7 @@ class CustomerDriver implements Driver {
         }
     }
 
+    //Melakukan proses checkout
     public void checkout() {
         if (keranjang.getBarang().isEmpty()) {
             System.out.println("Keranjang kosong. Tidak dapat melakukan checkout.");
@@ -255,6 +300,7 @@ class CustomerDriver implements Driver {
         }
     }
 
+    //Menampilkan history belanja customer
     public void lihatHistoryBelanja() {
         System.out.println("\nHistory Belanja:");
         for (Transaksi transaksi : historyBelanja) {
@@ -263,17 +309,32 @@ class CustomerDriver implements Driver {
     }
 }
 
+/**
+ * Kelas Keranjang yang menyimpan daftar barang yang akan dibeli oleh customer.
+ */
 class Keranjang {
     private ArrayList<Barang> barang;
 
+    //Konstruktor untuk membuat objek keranjang
     public Keranjang() {
         this.barang = new ArrayList<>();
     }
 
+    /**
+     * Menambah barang ke dalam keranjang.
+     *
+     * @param barang Barang yang akan ditambahkan.
+     */
     public void tambahBarang(Barang barang) {
         this.barang.add(barang);
     }
 
+    /**
+     * Menghapus barang dari keranjang berdasarkan ID barang.
+     *
+     * @param idBarang ID barang yang akan dihapus.
+     * @return Barang yang dihapus, atau null jika tidak ditemukan.
+     */
     public Barang hapusBarang(String idBarang) {
         for (Barang barang : barang) {
             if (barang.getId().equals(idBarang)) {
@@ -284,18 +345,28 @@ class Keranjang {
         return null;
     }
 
+    /**
+     * Mendapatkan daftar barang dalam keranjang.
+     *
+     * @return Daftar barang dalam keranjang.
+     */
     public ArrayList<Barang> getBarang() {
         return barang;
     }
 
+    //Mengosongkan isi keranjang
     public void clear() {
         barang.clear();
     }
 }
 
+/**
+ * Kelas ListBarang yang menyimpan daftar barang yang tersedia.
+ */
 class ListBarang {
     private ArrayList<Barang> barang;
 
+    //Konstruktor untuk membuat objek ListBarang dengan menambahkan barang dummy(data buatan).
     public ListBarang() {
         this.barang = new ArrayList<>();
         // Menambahkan barang dummy
@@ -303,10 +374,21 @@ class ListBarang {
         tambahBarang(new Barang("B002", "Smartphone", 2000000));
     }
 
+    /**
+     * Menambah barang ke dalam daftar barang.
+     *
+     * @param barang Barang yang akan ditambahkan.
+     */
     public void tambahBarang(Barang barang) {
         this.barang.add(barang);
     }
 
+    /**
+     * Menghapus barang dari daftar berdasarkan ID barang.
+     *
+     * @param idBarang ID barang yang akan dihapus.
+     * @return Barang yang dihapus, atau null jika tidak ditemukan.
+     */
     public Barang hapusBarang(String idBarang) {
         Barang barangDihapus = cariBarangById(idBarang);
         if (barangDihapus != null) {
@@ -315,6 +397,12 @@ class ListBarang {
         return barangDihapus;
     }
 
+    /**
+     * Mencari barang dalam daftar berdasarkan ID barang.
+     *
+     * @param idBarang ID barang yang akan dicari.
+     * @return Barang yang ditemukan, atau null jika tidak ditemukan.
+     */
     public Barang cariBarangById(String idBarang) {
         for (Barang barang : barang) {
             if (barang.getId().equals(idBarang)) {
@@ -324,42 +412,87 @@ class ListBarang {
         return null;
     }
 
+    /**
+     * Mendapatkan daftar barang.
+     *
+     * @return Daftar barang.
+     */
     public ArrayList<Barang> getBarang() {
         return barang;
     }
 }
 
+/**
+ * Kelas Barang yang merepresentasikan sebuah barang yang akan dijual.
+ */
 class Barang {
     private String id;
     private String nama;
     private double harga;
 
+    /**
+     * Konstruktor untuk membuat objek Barang.
+     *
+     * @param id    ID barang.
+     * @param nama  Nama barang.
+     * @param harga Harga barang.
+     */
     public Barang(String id, String nama, double harga) {
         this.id = id;
         this.nama = nama;
         this.harga = harga;
     }
 
+    /**
+     * Getter untuk mendapatkan ID barang.
+     *
+     * @return ID barang.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Getter untuk mendapatkan nama barang.
+     *
+     * @return Nama barang.
+     */
     public String getNama() {
         return nama;
     }
 
+    /**
+     * Setter untuk mengatur nama barang.
+     *
+     * @param nama Nama barang yang baru.
+     */
     public void setNama(String nama) {
         this.nama = nama;
     }
 
+    /**
+     * Getter untuk mendapatkan harga barang.
+     *
+     * @return Harga barang.
+     */
     public double getHarga() {
         return harga;
     }
 
+    /**
+     * Setter untuk mengatur harga barang.
+     *
+     * @param harga Harga barang yang baru.
+     */
     public void setHarga(double harga) {
         this.harga = harga;
     }
 
+    /**
+     * Override dari metode toString untuk representasi string objek Barang.
+     *
+     * @return String representasi objek Barang.
+     */
     @Override
     public String toString() {
         return "Barang{" +
@@ -370,23 +503,46 @@ class Barang {
     }
 }
 
+/**
+ * Kelas untuk merepresentasikan sebuah transaksi yang dilakukan oleh pengguna.
+ */
 class Transaksi {
     private Akun akun;
     private ArrayList<Barang> barang;
 
+    /**
+     * Konstruktor untuk membuat objek Transaksi.
+     *
+     * @param akun Objek akun yang melakukan transaksi.
+     */
     public Transaksi(Akun akun) {
         this.akun = akun;
         this.barang = new ArrayList<>();
     }
 
+    /**
+     * Setter untuk mengatur daftar barang dalam transaksi.
+     *
+     * @param barang Daftar barang dalam transaksi.
+     */
     public void setBarang(ArrayList<Barang> barang) {
         this.barang = barang;
     }
 
+    /**
+     * Getter untuk mendapatkan daftar barang dalam transaksi.
+     *
+     * @return Daftar barang dalam transaksi.
+     */
     public ArrayList<Barang> getBarang() {
         return barang;
     }
 
+    /**
+     * Override dari metode toString untuk representasi string objek Transaksi.
+     *
+     * @return String representasi objek Transaksi.
+     */
     @Override
     public String toString() {
         return "Transaksi{" +
@@ -396,15 +552,25 @@ class Transaksi {
     }
 }
 
+/**
+ * Kelas untuk merepresentasikan sebuah invoice dari transaksi yang dilakukan.
+ */
 class Invoice {
     private Transaksi transaksi;
     private Pembayaran pembayaran;
 
+    /**
+     * Konstruktor untuk membuat objek Invoice.
+     *
+     * @param transaksi   Objek transaksi yang di-invoice.
+     * @param pembayaran  Objek pembayaran untuk transaksi ini.
+     */
     public Invoice(Transaksi transaksi, Pembayaran pembayaran) {
         this.transaksi = transaksi;
         this.pembayaran = pembayaran;
     }
 
+    //Metode untuk mencetak invoice ke layar
     public void cetakInvoice() {
         System.out.println("======= INVOICE =======");
         System.out.println("Transaksi ID: " + transaksi.hashCode());
@@ -419,51 +585,97 @@ class Invoice {
     }
 }
 
+/**
+ * Interface untuk merepresentasikan metode pembayaran.
+ */
 interface Pembayaran {
     String getId();
 }
 
+/**
+ * Kelas untuk merepresentasikan metode pembayaran menggunakan QRIS.
+ */
 class QRIS implements Pembayaran {
     private String id;
 
+    /**
+     * Konstruktor untuk membuat objek QRIS.
+     *
+     * @param id ID QRIS.
+     */
     public QRIS(String id) {
         this.id = id;
     }
 
+    /**
+     * Getter untuk mendapatkan ID QRIS.
+     *
+     * @return ID QRIS.
+     */
     @Override
     public String getId() {
         return id;
     }
 }
 
+/**
+ * Kelas untuk merepresentasikan metode pembayaran menggunakan Bank.
+ */
 class Bank implements Pembayaran {
     private String id;
 
+    /**
+     * Konstruktor untuk membuat objek Bank.
+     *
+     * @param id ID Bank.
+     */
     public Bank(String id) {
         this.id = id;
     }
 
+    /**
+     * Getter untuk mendapatkan ID Bank.
+     *
+     * @return ID Bank.
+     */
     @Override
     public String getId() {
         return id;
     }
 }
 
+/**
+ * Kelas untuk merepresentasikan metode pembayaran menggunakan COD (Cash on Delivery).
+ */
 class COD implements Pembayaran {
     private String id;
 
+    /**
+     * Konstruktor untuk membuat objek COD.
+     *
+     * @param id ID COD.
+     */
     public COD(String id) {
         this.id = id;
     }
 
+    /**
+     * Getter untuk mendapatkan ID COD.
+     *
+     * @return ID COD.
+     */
     @Override
     public String getId() {
         return id;
     }
 }
 
+/**
+ * Kelas utama yang berisi metode main untuk menjalankan program.
+ */
 public class Main {
     public static void main(String[] args) {
+        //Implementasi metode main
         try (Scanner scanner = new Scanner(System.in)) {
             Akun akun = null;
             Driver driverAkun = null;
