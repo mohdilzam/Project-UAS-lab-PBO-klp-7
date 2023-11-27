@@ -1,7 +1,7 @@
 # Project-UAS-lab-PBO-klp-7
 Online Shopping with Java
 by :
-+ Cut Dahliana (22081070100
++ Cut Dahliana (2208107010027)
 + M. Ihsan Rizqullah Adfa (2208107010029)
 + Muhammad Ilzam (2208107010087)
 
