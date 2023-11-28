@@ -675,31 +675,41 @@ public class Main {
     }
 
     private static void loginAsAdmin() {
-        System.out.print("Masukkan ID Admin: ");
+        System.out.print("Masukkan ID Admin: "); // ID Admin : 000
         String id = scanner.next();
-        System.out.print("Masukkan Nama Admin: ");
-        String nama = scanner.next();
-
-        System.out.println("Login berhasil!");
-        akun = new Admin(id, nama);
-        driverAkun = new AdminDriver((Admin) akun, listBarang);
-
-        // Directly enter the Admin menu
-        adminMenu();
+        System.out.print("Masukkan Password Admin: "); // Password Admin : Admin
+        String password = scanner.next();
+    
+        // Verifikasi ID dan password Admin
+        if (id.equals("000") && password.equals("Admin")) {
+            System.out.println("Login berhasil!");
+            akun = new Admin(id, "Admin");
+            driverAkun = new AdminDriver((Admin) akun, listBarang);
+    
+            // Masuk ke menu Admin
+            adminMenu();
+        } else {
+            System.out.println("ID atau Password salah, silahkan coba lagi!");
+        }
     }
-
+    
     private static void loginAsCustomer() {
-        System.out.print("Masukkan ID Customer: ");
+        System.out.print("Masukkan ID Customer: "); // ID Customer : 001
         String id = scanner.next();
-        System.out.print("Masukkan Nama Customer: ");
-        String nama = scanner.next();
+        System.out.print("Masukkan Password Customer: "); //Password Customer : Customer
+        String password = scanner.next();
     
-        System.out.println("Login berhasil!");
-        akun = new Customer(id, nama);
-        driverAkun = new CustomerDriver((Customer) akun, listBarang, scanner);
+        // Verifikasi ID dan password Customer
+        if (id.equals("001") && password.equals("Customer")) {
+            System.out.println("Login berhasil!");
+            akun = new Customer(id, "Customer");
+            driverAkun = new CustomerDriver((Customer) akun, listBarang, scanner);
     
-        // Directly enter the Customer menu
-        userMenu();
+            // Masuk ke menu Customer
+            userMenu();
+        } else {
+            System.out.println("ID atau Password salah, silahkan coba lagi!");
+        }
     }
     
     
