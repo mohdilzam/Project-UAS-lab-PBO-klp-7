@@ -1,53 +1,293 @@
 import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
-/**
- * Kelas yang merepresentasikan akun pengguna.
- */
-class Akun {
+// Existing classes
+class Barang {
     private String id;
-    
-    /**
-     * Konstruktor untuk membuat objek Akun.
-     *
-     * @param id ID akun.
-     */
-    public Akun(String id) {
+    private String nama;
+    private double harga;
+    private int jumlah; // Added field for quantity
+
+    public Barang(String id, String nama, double harga) {
+        this.id = id;
+        this.nama = nama;
+        this.harga = harga;
+        this.jumlah = 0; // Default quantity is set to 0
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getNama() {
+        return nama;
+    }
+
+    public double getHarga() {
+        return harga;
+    }
+
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
+
+    public void setHarga(double harga) {
+        this.harga = harga;
+    }
+
+    public void setJumlah(int jumlah) {
+        this.jumlah = jumlah;
+    }
+
+    public int getJumlah() {
+        return jumlah;
+    }
+
+    @Override
+    public String toString() {
+        return "Barang{" +
+                "id='" + id + '\'' +
+                ", nama='" + nama + '\'' +
+                ", harga=" + harga +
+                ", jumlah=" + jumlah +
+                '}';
+    }
+}
+
+
+class ListBarang {
+    private List<Barang> listBarang;
+
+    public ListBarang() {
+        this.listBarang = new ArrayList<>();
+    }
+
+    public void tambahBarang(Barang barang) {
+        listBarang.add(barang);
+    }
+
+    public List<Barang> getBarang() {
+        return listBarang;
+    }
+
+    public Barang hapusBarang(String id) {
+        for (Barang barang : listBarang) {
+            if (barang.getId().equals(id)) {
+                listBarang.remove(barang);
+                return barang;
+            }
+        }
+        return null;
+    }
+
+    public Barang cariBarangById(String id) {
+        for (Barang barang : listBarang) {
+            if (barang.getId().equals(id)) {
+                return barang;
+            }
+        }
+        return null;
+    }
+
+    public void checkout() {
+        // Implementation for checkout logic
+    }
+    public void clear() {
+        listBarang.clear();
+    }
+}
+
+class Transaksi {
+    private Akun akun;
+    private List<Barang> barang;
+
+    public Transaksi(Akun akun) {
+        this.akun = akun;
+        this.barang = new ArrayList<>();
+    }
+
+    public void setBarang(List<Barang> barang) {
+        this.barang = barang;
+    }
+
+    public List<Barang> getBarang() {
+        return barang;
+    }
+
+    @Override
+    public String toString() {
+        return "Transaksi{" + "akun=" + akun.getId() + ", barang=" + barang + '}';
+    }
+}
+class Invoice {
+    private Transaksi transaksi;
+    private Pembayaran pembayaran;
+
+    public Invoice(Transaksi transaksi, Pembayaran pembayaran) {
+        this.transaksi = transaksi;
+        this.pembayaran = pembayaran;
+    }
+
+    public void cetakInvoice() {
+        System.out.println("======= INVOICE =======");
+        System.out.println("Transaksi ID: " + transaksi.hashCode());
+        System.out.println("Pembayaran: " + pembayaran.getId());
+        System.out.println("Barang yang dibeli:");
+        for (Barang barang : transaksi.getBarang()) {
+            System.out.println("- " + barang.getNama() + " - Rp " + barang.getHarga());
+        }
+        System.out.println("=======================");
+    }
+}
+interface Pembayaran {
+    String getId();
+}
+class QRIS implements Pembayaran {
+    private String id;
+
+    public QRIS(String id) {
         this.id = id;
     }
 
-    /**
-     * Mendapatkan ID akun.
-     *
-     * @return ID akun.
-     */
+    @Override
+    public String getId() {
+        return id;
+    }
+}
+class Bank implements Pembayaran {
+    private String id;
+
+    public Bank(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+}
+class COD implements Pembayaran {
+    private String id;
+
+    public COD(String id) {
+        this.id = id;
+    }
+
+    @Override
     public String getId() {
         return id;
     }
 }
 
-//Interface Driver yang menentukan metode login.
-interface Driver {
-    void login();
+abstract class Akun {
+    private String id;
+    private String nama;
+
+    public Akun(String id, String nama) {
+        this.id = id;
+        this.nama = nama;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getNama() {
+        return nama;
+    }
+
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
+
+    public abstract void setPembayaran(Pembayaran pembayaran);
+
+    public void login() {
+        // Implementasi login
+        System.out.println("Login as: " + getNama());
+    }
+
+    public ListBarang getBasket() {
+        // Return the basket for the user (Customer)
+        return null;
+    }
 }
 
-/**
- * Kelas AdminDriver yang mengimplementasikan interface Driver.
- * Digunakan oleh admin untuk mengelola barang di sistem.
- */
-class AdminDriver implements Driver {
-    private Akun akun;
-    private ListBarang listBarang;
+class Customer extends Akun {
+    private ListBarang basket;
 
-    /**
-     * Konstruktor untuk membuat objek AdminDriver.
-     *
-     * @param akun       Objek Akun admin.
-     * @param listBarang Objek ListBarang yang berisi daftar barang.
-     */
-    public AdminDriver(Akun akun, ListBarang listBarang) {
+    public Customer(String id, String nama) {
+        super(id, nama);
+        this.basket = new ListBarang();
+    }
+
+    public ListBarang getBasket() {
+        return basket;
+    }
+
+    @Override
+    public void setPembayaran(Pembayaran pembayaran) {
+        // Implementasi untuk Customer
+    }
+}
+
+class Admin extends Akun {
+    public Admin(String id, String nama) {
+        super(id, nama);
+    }
+
+    @Override
+    public void setPembayaran(Pembayaran pembayaran) {
+        // Implementasi untuk Admin
+    }
+}
+
+// New classes
+
+class Keranjang {
+    private List<Barang> barang;
+
+    public Keranjang() {
+        this.barang = new ArrayList<>();
+    }
+
+    public void tambahBarang(Barang barang) {
+        this.barang.add(barang);
+    }
+
+    public List<Barang> getBarang() {
+        return barang;
+    }
+}
+
+abstract class Driver {
+    protected Akun akun;
+    protected ListBarang listBarang;
+
+    public Driver(Akun akun, ListBarang listBarang) {
         this.akun = akun;
         this.listBarang = listBarang;
+    }
+
+    public abstract void login();
+
+    public abstract void kelolaBarang(Scanner scanner);
+
+    public abstract void beliBarang();
+
+    public abstract void lihatListBarang();
+
+    public abstract void checkout();
+
+    public abstract void pilihMetodePembayaran();
+}
+
+
+class AdminDriver extends Driver {
+    public AdminDriver(Akun akun, ListBarang listBarang) {
+        super(akun, listBarang);
     }
 
     @Override
@@ -55,123 +295,111 @@ class AdminDriver implements Driver {
         System.out.println("Admin " + akun.getId() + " login.");
     }
 
-    //Menampilkan daftar barang.
-    public void lihatBarang() {
-        System.out.println("\nList Barang:");
-        for (Barang barang : listBarang.getBarang()) {
-            System.out.println(barang);
-        }
-    }
-
-    //Menu untuk mengelola barang (tambah, hapus, edit).
-    public void kelolaBarang() {
-        try (Scanner scanner = new Scanner(System.in)) {
+    @Override
+    public void kelolaBarang(Scanner scanner) {
+        try {
             while (true) {
+                System.out.println("\nList Barang:");
+                for (Barang barang : listBarang.getBarang()) {
+                    System.out.println(barang);
+                }
                 System.out.println("\nMenu Kelola Barang:");
                 System.out.println("1. Tambah Barang");
                 System.out.println("2. Hapus Barang");
                 System.out.println("3. Edit Barang");
                 System.out.println("0. Kembali");
                 System.out.print("Pilih opsi: ");
-                int opsi = scanner.nextInt();
-
-                switch (opsi) {
+                int pilihan = scanner.nextInt();
+                switch (pilihan) {
                     case 1:
-                        tambahBarang();
+                        System.out.print("Masukkan ID barang: ");
+                        String idBarang = scanner.next();
+                        System.out.print("Masukkan Nama barang: ");
+                        String namaBarang = scanner.next();
+                        double hargaBarang = 0.0;
+                        while (true) {
+                            try {
+                                System.out.print("Masukkan Harga barang: ");
+                                hargaBarang = scanner.nextDouble();
+                                break;
+                            } catch (InputMismatchException e) {
+                                System.out.println("Harga tidak valid. Masukkan angka.");
+                                scanner.next();
+                            }
+                        }
+                        Barang barang = new Barang(idBarang, namaBarang, hargaBarang);
+                        listBarang.tambahBarang(barang);
+                        System.out.println("Barang berhasil ditambahkan: " + barang);
                         break;
                     case 2:
-                        hapusBarang();
+                        System.out.print("Masukkan ID barang yang akan dihapus: ");
+                        String idBarangHapus = scanner.next();
+                        Barang barangHapus = listBarang.hapusBarang(idBarangHapus);
+                        if (barangHapus != null) {
+                            System.out.println("Barang berhasil dihapus: " + barangHapus);
+                        } else {
+                            System.out.println("Barang dengan ID " + idBarangHapus + " tidak ditemukan.");
+                        }
                         break;
                     case 3:
-                        editBarang();
+                        System.out.print("Masukkan ID barang yang akan diedit: ");
+                        String idBarangEdit = scanner.next();
+                        Barang barangEdit = listBarang.cariBarangById(idBarangEdit);
+                        if (barangEdit != null) {
+                            System.out.print("Masukkan Nama barang baru: ");
+                            String namaBarangEdit = scanner.next();
+                            System.out.print("Masukkan Harga barang baru: ");
+                            double hargaBarangEdit = scanner.nextDouble();
+                            barangEdit.setNama(namaBarangEdit);
+                            barangEdit.setHarga(hargaBarangEdit);
+                            System.out.println("Barang berhasil diedit: " + barangEdit);
+                        } else {
+                            System.out.println("Barang dengan ID " + idBarangEdit + " tidak ditemukan.");
+                        }
                         break;
                     case 0:
-                        System.out.println("Kembali ke Menu Utama.");
-                        return;
+                        return; // Keluar dari metode jika pilihan adalah 0
                     default:
-                        System.out.println("Opsi tidak valid. Silakan coba lagi.");
+                        System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+                        break;
                 }
             }
+        }catch (InputMismatchException e) {
+            System.out.println("Input tidak valid. Silakan coba lagi.");
+            scanner.nextLine(); // Consume the invalid input
         }
     }
 
-    //menambah barang ke daftar
-    private void tambahBarang() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Masukkan ID barang: ");
-            String idBarang = scanner.next();
-            System.out.print("Masukkan Nama barang: ");
-            String namaBarang = scanner.next();
-            System.out.print("Masukkan Harga barang: ");
-            double hargaBarang = scanner.nextDouble();
+    @Override
+    public void beliBarang() {
+        // Admin cannot buy items
+        System.out.println("Admin tidak dapat melakukan pembelian.");
+    }
 
-            Barang barang = new Barang(idBarang, namaBarang, hargaBarang);
-            listBarang.tambahBarang(barang);
-            System.out.println("Barang berhasil ditambahkan: " + barang);
+    @Override
+    public void lihatListBarang() {
+        // Admin can view the list of items
+        System.out.println("\nList Barang:");
+        for (Barang barang : listBarang.getBarang()) {
+            System.out.println(barang);
         }
     }
 
-    //Menghapus barang dari daftar
-    private void hapusBarang() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Masukkan ID barang yang akan dihapus: ");
-            String idBarang = scanner.next();
-
-            Barang barang = listBarang.hapusBarang(idBarang);
-            if (barang != null) {
-                System.out.println("Barang berhasil dihapus: " + barang);
-            } else {
-                System.out.println("Barang dengan ID " + idBarang + " tidak ditemukan.");
-            }
-        }
+    @Override
+    public void checkout() {
+        // Admin cannot checkout
+        System.out.println("Admin tidak dapat melakukan checkout.");
     }
 
-    //Mengedit barang di daftar
-    private void editBarang() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Masukkan ID barang yang akan diedit: ");
-            String idBarang = scanner.next();
-
-            Barang barang = listBarang.cariBarangById(idBarang);
-            if (barang != null) {
-                System.out.print("Masukkan Nama barang baru: ");
-                String namaBarang = scanner.next();
-                System.out.print("Masukkan Harga barang baru: ");
-                double hargaBarang = scanner.nextDouble();
-
-                barang.setNama(namaBarang);
-                barang.setHarga(hargaBarang);
-                System.out.println("Barang berhasil diedit: " + barang);
-            } else {
-                System.out.println("Barang dengan ID " + idBarang + " tidak ditemukan.");
-            }
-        }
+    @Override
+    public void pilihMetodePembayaran() {
+        // Admin cannot choose a payment method
+        System.out.println("Admin tidak dapat memilih metode pembayaran.");
     }
 }
-
-/**
- * Kelas CustomerDriver yang mengimplementasikan interface Driver.
- * Digunakan oleh customer untuk melakukan pembelian barang.
- */
-class CustomerDriver implements Driver {
-    private Akun akun;
-    private Keranjang keranjang;
-    private Transaksi transaksi;
-    private ListBarang listBarang;
-    private ArrayList<Transaksi> historyBelanja;
-
-    /**
-     * Konstruktor untuk membuat objek CustomerDriver.
-     *
-     * @param akun       Objek Akun customer.
-     * @param listBarang Objek ListBarang yang berisi daftar barang.
-     */
+class CustomerDriver extends Driver {
     public CustomerDriver(Akun akun, ListBarang listBarang) {
-        this.akun = akun;
-        this.keranjang = new Keranjang();
-        this.transaksi = new Transaksi(akun);
-        this.listBarang = listBarang;
-        this.historyBelanja = new ArrayList<>();
+        super(akun, listBarang);
     }
 
     @Override
@@ -179,553 +407,309 @@ class CustomerDriver implements Driver {
         System.out.println("Customer " + akun.getId() + " login.");
     }
 
-    //Menampilkan daftar barang
-    public void lihatBarang() {
+    @Override
+    public void kelolaBarang(Scanner scanner) {
+        try {
+            while (true) {
+                System.out.println("\nList Barang:");
+                for (Barang barang : listBarang.getBarang()) {
+                    System.out.println(barang);
+                }
+                System.out.println("\nMenu Kelola Barang:");
+                System.out.println("1. Tambah Barang");
+                System.out.println("2. Hapus Barang");
+                System.out.println("3. Edit Barang");
+                System.out.println("0. Kembali");
+                System.out.print("Pilih opsi: ");
+                int pilihan = scanner.nextInt();
+                switch (pilihan) {
+                    case 1:
+                        System.out.print("Masukkan ID barang yang akan ditambahkan ke keranjang: ");
+                        String idBarangTambah = scanner.next();
+                        Barang barangTambah = listBarang.cariBarangById(idBarangTambah);
+                        if (barangTambah != null) {
+                            akun.getBasket().tambahBarang(barangTambah);
+                            System.out.println("Barang berhasil ditambahkan ke keranjang.");
+                        } else {
+                            System.out.println("Barang dengan ID " + idBarangTambah + " tidak ditemukan.");
+                        }
+                        break;
+                    case 2:
+                        System.out.print("Masukkan ID barang yang akan dihapus dari keranjang: ");
+                        String idBarangHapus = scanner.next();
+                        Barang barangHapus = akun.getBasket().hapusBarang(idBarangHapus);
+                        if (barangHapus != null) {
+                            System.out.println("Barang berhasil dihapus dari keranjang: " + barangHapus);
+                        } else {
+                            System.out.println("Barang dengan ID " + idBarangHapus + " tidak ditemukan dalam keranjang.");
+                        }
+                        break;
+                    case 3:
+                        System.out.print("Masukkan ID barang yang akan diubah jumlahnya dalam keranjang: ");
+                        String idBarangEdit = scanner.next();
+                        Barang barangEdit = akun.getBasket().cariBarangById(idBarangEdit);
+                        if (barangEdit != null) {
+                            System.out.print("Masukkan jumlah barang baru: ");
+                            int jumlahBarangEdit = scanner.nextInt();
+                            barangEdit.setJumlah(jumlahBarangEdit);
+                            System.out.println("Jumlah barang dalam keranjang berhasil diubah: " + barangEdit);
+                        } else {
+                            System.out.println("Barang dengan ID " + idBarangEdit + " tidak ditemukan dalam keranjang.");
+                        }
+                        break;
+                    case 0:
+                        return; // Keluar dari metode jika pilihan adalah 0
+                    default:
+                        System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+                        break;
+                }
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Input tidak valid. Silakan coba lagi.");
+            scanner.nextLine(); // Consume the invalid input
+        }
+    }
+    @Override
+public void beliBarang() {
+    try (Scanner scanner = new Scanner(System.in)) {
+        while (true) {
+            System.out.println("\nList Barang:");
+            for (Barang barang : listBarang.getBarang()) {
+                System.out.println(barang);
+            }
+            System.out.println("\nMenu Beli Barang:");
+            System.out.println("1. Tambah Barang ke Keranjang");
+            System.out.println("2. Checkout");
+            System.out.println("0. Kembali");
+            System.out.print("Pilih opsi: ");
+            int pilihan = scanner.nextInt();
+            switch (pilihan) {
+                case 1:
+                    System.out.print("Masukkan ID barang yang akan dibeli: ");
+                    String idBarangBeli = scanner.next();
+                    Barang barangBeli = listBarang.cariBarangById(idBarangBeli);
+                    if (barangBeli != null) {
+                        akun.getBasket().tambahBarang(barangBeli);
+                        System.out.println("Barang berhasil ditambahkan ke keranjang.");
+                    } else {
+                        System.out.println("Barang dengan ID " + idBarangBeli + " tidak ditemukan.");
+                    }
+                    break;
+                case 2:
+                    akun.getBasket().checkout();
+                    return; // Keluar dari metode jika pilihan adalah 2
+                case 0:
+                    return; // Keluar dari metode jika pilihan adalah 0
+                default:
+                    System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+                    break;
+            }
+        }
+    }
+}
+    @Override
+    public void lihatListBarang() {
+        // Customer can view the list of items
         System.out.println("\nList Barang:");
         for (Barang barang : listBarang.getBarang()) {
             System.out.println(barang);
         }
     }
 
-    //Menu untuk mengelola keranjang (tambah, hapus, lihat, checkout)
-    public void kelolaKeranjang() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (true) {
-                System.out.println("\nMenu Keranjang:");
-                System.out.println("1. Tambah Barang ke Keranjang");
-                System.out.println("2. Hapus Barang dari Keranjang");
-                System.out.println("3. Lihat Keranjang");
-                System.out.println("0. Kembali");
-                System.out.print("Pilih opsi: ");
-                int opsi = scanner.nextInt();
-
-                switch (opsi) {
-                    case 1:
-                        tambahKeKeranjang();
-                        break;
-                    case 2:
-                        hapusDariKeranjang();
-                        break;
-                    case 3:
-                        lihatKeranjang();
-                        break;
-                    case 0:
-                        System.out.println("Kembali ke Menu Utama.");
-                        return;
-                    default:
-                        System.out.println("Opsi tidak valid. Silakan coba lagi.");
-                }
-            }
-        }
-    }
-
-    //Menambahkan barang ke keranjang
-    private void tambahKeKeranjang() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Masukkan ID barang yang akan ditambahkan ke keranjang: ");
-            String idBarang = scanner.next();
-
-            Barang barang = listBarang.cariBarangById(idBarang);
-            if (barang != null) {
-                keranjang.tambahBarang(barang);
-                System.out.println("Barang berhasil ditambahkan ke keranjang: " + barang);
-            } else {
-                System.out.println("Barang dengan ID " + idBarang + " tidak ditemukan.");
-            }
-        }
-    }
-
-    //Menghapus barang dari keranjang
-    private void hapusDariKeranjang() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Masukkan ID barang yang akan dihapus dari keranjang: ");
-            String idBarang = scanner.next();
-
-            Barang barang = keranjang.hapusBarang(idBarang);
-            if (barang != null) {
-                System.out.println("Barang berhasil dihapus dari keranjang: " + barang);
-            } else {
-                System.out.println("Barang dengan ID " + idBarang + " tidak ditemukan di keranjang.");
-            }
-        }
-    }
-
-    //Menampilkan isi keranjang
-    private void lihatKeranjang() {
-        System.out.println("\nIsi Keranjang:");
-        for (Barang barang : keranjang.getBarang()) {
-            System.out.println(barang);
-        }
-    }
-
-    //Melakukan proses checkout
+    @Override
     public void checkout() {
-        if (keranjang.getBarang().isEmpty()) {
-            System.out.println("Keranjang kosong. Tidak dapat melakukan checkout.");
-            return;
-        }
-
+        // Customer can checkout
         try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("Metode Pembayaran:");
-            System.out.println("1. QRIS");
-            System.out.println("2. Bank");
-            System.out.println("3. COD (Cash on Delivery)");
-            System.out.print("Pilih metode pembayaran: ");
-            int metodePembayaran = scanner.nextInt();
-
-            Pembayaran pembayaran = null;
-
-            switch (metodePembayaran) {
-                case 1:
-                    pembayaran = new QRIS("QR001");
-                    break;
-                case 2:
-                    pembayaran = new Bank("BCA");
-                    break;
-                case 3:
-                    pembayaran = new COD("COD001");
-                    break;
-                default:
-                    System.out.println("Metode pembayaran tidak valid.");
-                    return;
-            }
-
-            transaksi.setBarang(keranjang.getBarang());
-            Invoice invoice = new Invoice(transaksi, pembayaran);
-            historyBelanja.add(transaksi);
-            keranjang.clear();
-            System.out.println("Checkout berhasil!");
-            System.out.println("Invoice:");
-            System.out.println(invoice);
-        }
-    }
-
-    //Menampilkan history belanja customer
-    public void lihatHistoryBelanja() {
-        System.out.println("\nHistory Belanja:");
-        for (Transaksi transaksi : historyBelanja) {
-            System.out.println(transaksi);
-        }
-    }
-}
-
-/**
- * Kelas Keranjang yang menyimpan daftar barang yang akan dibeli oleh customer.
- */
-class Keranjang {
-    private ArrayList<Barang> barang;
-
-    //Konstruktor untuk membuat objek keranjang
-    public Keranjang() {
-        this.barang = new ArrayList<>();
-    }
-
-    /**
-     * Menambah barang ke dalam keranjang.
-     *
-     * @param barang Barang yang akan ditambahkan.
-     */
-    public void tambahBarang(Barang barang) {
-        this.barang.add(barang);
-    }
-
-    /**
-     * Menghapus barang dari keranjang berdasarkan ID barang.
-     *
-     * @param idBarang ID barang yang akan dihapus.
-     * @return Barang yang dihapus, atau null jika tidak ditemukan.
-     */
-    public Barang hapusBarang(String idBarang) {
-        for (Barang barang : barang) {
-            if (barang.getId().equals(idBarang)) {
-                this.barang.remove(barang);
-                return barang;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Mendapatkan daftar barang dalam keranjang.
-     *
-     * @return Daftar barang dalam keranjang.
-     */
-    public ArrayList<Barang> getBarang() {
-        return barang;
-    }
-
-    //Mengosongkan isi keranjang
-    public void clear() {
-        barang.clear();
-    }
-}
-
-/**
- * Kelas ListBarang yang menyimpan daftar barang yang tersedia.
- */
-class ListBarang {
-    private ArrayList<Barang> barang;
-
-    //Konstruktor untuk membuat objek ListBarang dengan menambahkan barang dummy(data buatan).
-    public ListBarang() {
-        this.barang = new ArrayList<>();
-        // Menambahkan barang dummy
-        tambahBarang(new Barang("B001", "Laptop", 5000000));
-        tambahBarang(new Barang("B002", "Smartphone", 2000000));
-    }
-
-    /**
-     * Menambah barang ke dalam daftar barang.
-     *
-     * @param barang Barang yang akan ditambahkan.
-     */
-    public void tambahBarang(Barang barang) {
-        this.barang.add(barang);
-    }
-
-    /**
-     * Menghapus barang dari daftar berdasarkan ID barang.
-     *
-     * @param idBarang ID barang yang akan dihapus.
-     * @return Barang yang dihapus, atau null jika tidak ditemukan.
-     */
-    public Barang hapusBarang(String idBarang) {
-        Barang barangDihapus = cariBarangById(idBarang);
-        if (barangDihapus != null) {
-            this.barang.remove(barangDihapus);
-        }
-        return barangDihapus;
-    }
-
-    /**
-     * Mencari barang dalam daftar berdasarkan ID barang.
-     *
-     * @param idBarang ID barang yang akan dicari.
-     * @return Barang yang ditemukan, atau null jika tidak ditemukan.
-     */
-    public Barang cariBarangById(String idBarang) {
-        for (Barang barang : barang) {
-            if (barang.getId().equals(idBarang)) {
-                return barang;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Mendapatkan daftar barang.
-     *
-     * @return Daftar barang.
-     */
-    public ArrayList<Barang> getBarang() {
-        return barang;
-    }
-}
-
-/**
- * Kelas Barang yang merepresentasikan sebuah barang yang akan dijual.
- */
-class Barang {
-    private String id;
-    private String nama;
-    private double harga;
-
-    /**
-     * Konstruktor untuk membuat objek Barang.
-     *
-     * @param id    ID barang.
-     * @param nama  Nama barang.
-     * @param harga Harga barang.
-     */
-    public Barang(String id, String nama, double harga) {
-        this.id = id;
-        this.nama = nama;
-        this.harga = harga;
-    }
-
-    /**
-     * Getter untuk mendapatkan ID barang.
-     *
-     * @return ID barang.
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Getter untuk mendapatkan nama barang.
-     *
-     * @return Nama barang.
-     */
-    public String getNama() {
-        return nama;
-    }
-
-    /**
-     * Setter untuk mengatur nama barang.
-     *
-     * @param nama Nama barang yang baru.
-     */
-    public void setNama(String nama) {
-        this.nama = nama;
-    }
-
-    /**
-     * Getter untuk mendapatkan harga barang.
-     *
-     * @return Harga barang.
-     */
-    public double getHarga() {
-        return harga;
-    }
-
-    /**
-     * Setter untuk mengatur harga barang.
-     *
-     * @param harga Harga barang yang baru.
-     */
-    public void setHarga(double harga) {
-        this.harga = harga;
-    }
-
-    /**
-     * Override dari metode toString untuk representasi string objek Barang.
-     *
-     * @return String representasi objek Barang.
-     */
-    @Override
-    public String toString() {
-        return "Barang{" +
-                "id='" + id + '\'' +
-                ", nama='" + nama + '\'' +
-                ", harga=" + harga +
-                '}';
-    }
-}
-
-/**
- * Kelas untuk merepresentasikan sebuah transaksi yang dilakukan oleh pengguna.
- */
-class Transaksi {
-    private Akun akun;
-    private ArrayList<Barang> barang;
-
-    /**
-     * Konstruktor untuk membuat objek Transaksi.
-     *
-     * @param akun Objek akun yang melakukan transaksi.
-     */
-    public Transaksi(Akun akun) {
-        this.akun = akun;
-        this.barang = new ArrayList<>();
-    }
-
-    /**
-     * Setter untuk mengatur daftar barang dalam transaksi.
-     *
-     * @param barang Daftar barang dalam transaksi.
-     */
-    public void setBarang(ArrayList<Barang> barang) {
-        this.barang = barang;
-    }
-
-    /**
-     * Getter untuk mendapatkan daftar barang dalam transaksi.
-     *
-     * @return Daftar barang dalam transaksi.
-     */
-    public ArrayList<Barang> getBarang() {
-        return barang;
-    }
-
-    /**
-     * Override dari metode toString untuk representasi string objek Transaksi.
-     *
-     * @return String representasi objek Transaksi.
-     */
-    @Override
-    public String toString() {
-        return "Transaksi{" +
-                "akun=" + akun.getId() +
-                ", barang=" + barang +
-                '}';
-    }
-}
-
-/**
- * Kelas untuk merepresentasikan sebuah invoice dari transaksi yang dilakukan.
- */
-class Invoice {
-    private Transaksi transaksi;
-    private Pembayaran pembayaran;
-
-    /**
-     * Konstruktor untuk membuat objek Invoice.
-     *
-     * @param transaksi   Objek transaksi yang di-invoice.
-     * @param pembayaran  Objek pembayaran untuk transaksi ini.
-     */
-    public Invoice(Transaksi transaksi, Pembayaran pembayaran) {
-        this.transaksi = transaksi;
-        this.pembayaran = pembayaran;
-    }
-
-    //Metode untuk mencetak invoice ke layar
-    public void cetakInvoice() {
-        System.out.println("======= INVOICE =======");
-        System.out.println("Transaksi ID: " + transaksi.hashCode());
-        System.out.println("Pembayaran: " + pembayaran.getId());
-        System.out.println("Barang yang dibeli:");
-
-        for (Barang barang : transaksi.getBarang()) {
-            System.out.println("- " + barang.getNama() + " - Rp " + barang.getHarga());
-        }
-
-        System.out.println("=======================");
-    }
-}
-
-/**
- * Interface untuk merepresentasikan metode pembayaran.
- */
-interface Pembayaran {
-    String getId();
-}
-
-/**
- * Kelas untuk merepresentasikan metode pembayaran menggunakan QRIS.
- */
-class QRIS implements Pembayaran {
-    private String id;
-
-    /**
-     * Konstruktor untuk membuat objek QRIS.
-     *
-     * @param id ID QRIS.
-     */
-    public QRIS(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Getter untuk mendapatkan ID QRIS.
-     *
-     * @return ID QRIS.
-     */
-    @Override
-    public String getId() {
-        return id;
-    }
-}
-
-/**
- * Kelas untuk merepresentasikan metode pembayaran menggunakan Bank.
- */
-class Bank implements Pembayaran {
-    private String id;
-
-    /**
-     * Konstruktor untuk membuat objek Bank.
-     *
-     * @param id ID Bank.
-     */
-    public Bank(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Getter untuk mendapatkan ID Bank.
-     *
-     * @return ID Bank.
-     */
-    @Override
-    public String getId() {
-        return id;
-    }
-}
-
-/**
- * Kelas untuk merepresentasikan metode pembayaran menggunakan COD (Cash on Delivery).
- */
-class COD implements Pembayaran {
-    private String id;
-
-    /**
-     * Konstruktor untuk membuat objek COD.
-     *
-     * @param id ID COD.
-     */
-    public COD(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Getter untuk mendapatkan ID COD.
-     *
-     * @return ID COD.
-     */
-    @Override
-    public String getId() {
-        return id;
-    }
-}
-
-/**
- * Kelas utama yang berisi metode main untuk menjalankan program.
- */
-public class Main {
-    public static void main(String[] args) {
-        //Implementasi metode main
-        try (Scanner scanner = new Scanner(System.in)) {
-            Akun akun = null;
-            Driver driverAkun = null;
-            ListBarang listBarang = new ListBarang();
-            listBarang.tambahBarang(new Barang("B001", "Laptop", 5000000));
-            listBarang.tambahBarang(new Barang("B002", "Smartphone", 2000000));
-
             while (true) {
-                System.out.println("Selamat datang di Sistem Perbelanjaan Online!");
-                System.out.println("1. Login");
-                System.out.println("0. Keluar");
+                System.out.println("\nKeranjang Belanja:");
+                for (Barang barang : akun.getBasket().getBarang()) {
+                    System.out.println(barang);
+                }
+                System.out.println("\nMenu Checkout:");
+                System.out.println("1. Proses Checkout");
+                System.out.println("2. Batalkan Checkout");
                 System.out.print("Pilih opsi: ");
                 int pilihan = scanner.nextInt();
-
-                if (pilihan == 1) {
-                    System.out.print("Masukkan ID akun: ");
-                    String idAkun = scanner.next();
-                    System.out.print("Pilih jenis akun (Admin/Customer): ");
-                    String jenisAkun = scanner.next();
-
-                    if (jenisAkun.equals("Admin")) {
-                        akun = new Akun(idAkun);
-                        driverAkun = new AdminDriver(akun, listBarang);
-                    } else if (jenisAkun.equals("Customer")) {
-                        akun = new Akun(idAkun);
-                        driverAkun = new CustomerDriver(akun, listBarang);
-                    } else {
-                        System.out.println("Jenis akun tidak valid. Silakan coba lagi.");
-                        continue;
-                    }
-
-                    driverAkun.login();
-
-                    if (driverAkun instanceof AdminDriver) {
-                        ((AdminDriver) driverAkun).lihatBarang();
-                        ((AdminDriver) driverAkun).kelolaBarang();
-                    } else if (driverAkun instanceof CustomerDriver) {
-                        ((CustomerDriver) driverAkun).lihatBarang();
-                        ((CustomerDriver) driverAkun).kelolaKeranjang();
-                        ((CustomerDriver) driverAkun).checkout();
-                        ((CustomerDriver) driverAkun).lihatHistoryBelanja();
-                    }
-                } else if (pilihan == 0) {
-                    System.out.println("Terima kasih! Program selesai.");
-                    break;
-                } else {
-                    System.out.println("Opsi tidak valid. Silakan coba lagi.");
+                switch (pilihan) {
+                    case 1:
+                        akun.getBasket().checkout();
+                        System.out.println("Checkout berhasil!");
+                        return; // Keluar dari metode jika pilihan adalah 1
+                    case 2:
+                        akun.getBasket().clear();
+                        System.out.println("Checkout dibatalkan. Keranjang belanja dikosongkan.");
+                        return; // Keluar dari metode jika pilihan adalah 2
+                    default:
+                        System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+                        break;
                 }
             }
         }
     }
+
+    @Override
+    public void pilihMetodePembayaran() {
+        // Customer can choose a payment method
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("\nMetode Pembayaran:");
+            System.out.println("1. QRIS");
+            System.out.println("2. Transfer Bank");
+            System.out.println("3. COD (Cash on Delivery)");
+            System.out.print("Pilih metode pembayaran (1-3): ");
+            int metodePembayaran = scanner.nextInt();
+            switch (metodePembayaran) {
+                case 1:
+                    akun.setPembayaran(new QRIS(generateRandomId()));
+                    break;
+                case 2:
+                    akun.setPembayaran(new Bank(generateRandomId()));
+                    break;
+                case 3:
+                    akun.setPembayaran(new COD(generateRandomId()));
+                    break;
+                default:
+                    System.out.println("Metode pembayaran tidak valid. Silakan coba lagi.");
+                    break;
+            }
+        }
+    }
+
+    private String generateRandomId() {
+        return String.valueOf((int) (Math.random() * 1000000));
+    }
 }
 
+public class Main1 {
+    private static Akun akun;
+    private static Driver driverAkun;
+    private static ListBarang listBarang = new ListBarang(); // Initialize listBarang
+    private static Scanner scanner = new Scanner(System.in); // Create Scanner object
+
+    public static void main(String[] args) {
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\nMenu:");
+            System.out.println("1. Login as Admin");
+            System.out.println("2. Login as Customer");
+            System.out.println("3. Exit");
+
+            System.out.print("Masukkan pilihan: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    loginAsAdmin();
+                    break;
+                case 2:
+                    loginAsCustomer();
+                    break;
+                case 3:
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+                    break;
+            }
+        }
+
+        System.out.println("Terima kasih! Program selesai.");
+        scanner.close(); // Close the Scanner when the program is finished
+    }
+
+    private static void loginAsAdmin() {
+        System.out.print("Masukkan ID Admin: ");
+        String id = scanner.next();
+        System.out.print("Masukkan Nama Admin: ");
+        String nama = scanner.next();
+
+        System.out.println("Login berhasil!");
+        akun = new Admin(id, nama);
+        driverAkun = new AdminDriver((Admin) akun, listBarang);
+
+        // Directly enter the Admin menu
+        adminMenu();
+    }
+
+    private static void loginAsCustomer() {
+        System.out.print("Masukkan ID Customer: ");
+        String id = scanner.next();
+        System.out.print("Masukkan Nama Customer: ");
+        String nama = scanner.next();
+
+        System.out.println("Login berhasil!");
+        akun = new Customer(id, nama);
+        driverAkun = new CustomerDriver((Customer) akun, listBarang);
+
+        // Directly enter the Customer menu
+        userMenu();
+    }
+
+    private static void userMenu() {
+        boolean userMenuRunning = true;
+        while (userMenuRunning) {
+            System.out.println("\nUser Menu:");
+            System.out.println("1. Kelola Barang");
+            System.out.println("2. Beli Barang");
+            System.out.println("3. Lihat List Barang");
+            System.out.println("4. Checkout");
+            System.out.println("5. Pilih Metode Pembayaran");
+            System.out.println("0. Logout");
+
+            System.out.print("Masukkan pilihan: ");
+            int userChoice = scanner.nextInt();
+
+            switch (userChoice) {
+                case 1:
+                    driverAkun.kelolaBarang(scanner);
+                    break;
+                case 2:
+                    driverAkun.beliBarang();
+                    break;
+                case 3:
+                    driverAkun.lihatListBarang();
+                    break;
+                case 4:
+                    driverAkun.checkout();
+                    break;
+                case 5:
+                    driverAkun.pilihMetodePembayaran();
+                    break;
+                case 0:
+                    userMenuRunning = false;
+                    akun = null;
+                    driverAkun = null;
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+                    break;
+            }
+        }
+    }
+
+    private static void adminMenu() {
+        boolean adminMenuRunning = true;
+        while (adminMenuRunning) {
+            System.out.println("\nAdmin Menu:");
+            System.out.println("1. Kelola Barang");
+            System.out.println("2. Logout");
+
+            System.out.print("Masukkan pilihan: ");
+            int adminChoice = scanner.nextInt();
+
+            switch (adminChoice) {
+                case 1:
+                    driverAkun.kelolaBarang(scanner);
+                    break;
+                case 2:
+                    adminMenuRunning = false;
+                    akun = null;
+                    driverAkun = null;
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+                    break;
+            }
+        }
+    }
+}
