@@ -579,7 +579,7 @@ public void beliBarang() {
     }
 }
 
-public class Main1 {
+public class Main {
     private static Akun akun;
     private static Driver driverAkun;
     private static ListBarang listBarang = new ListBarang(); // Initialize listBarang
