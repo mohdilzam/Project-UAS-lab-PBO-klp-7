@@ -1,6 +1,6 @@
 import java.util.ArrayList;
-import java.util.List;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -185,6 +185,7 @@ class COD implements Pembayaran {
 abstract class Akun {
     private String id;
     private String nama;
+    protected Pembayaran pembayaran;
 
     public Akun(String id, String nama) {
         this.id = id;
@@ -201,6 +202,10 @@ abstract class Akun {
 
     public void setNama(String nama) {
         this.nama = nama;
+    }
+
+    public Pembayaran getPembayaran() {
+        return pembayaran;
     }
 
     public abstract void setPembayaran(Pembayaran pembayaran);
@@ -230,8 +235,10 @@ class Customer extends Akun {
 
     @Override
     public void setPembayaran(Pembayaran pembayaran) {
+        this.pembayaran = pembayaran;
         // Implementasi untuk Customer
     }
+    
 }
 
 class Admin extends Akun {
@@ -241,6 +248,7 @@ class Admin extends Akun {
 
     @Override
     public void setPembayaran(Pembayaran pembayaran) {
+        this.pembayaran = pembayaran;
         // Implementasi untuk Admin
     }
 }
@@ -312,26 +320,38 @@ class AdminDriver extends Driver {
                 System.out.print("Pilih opsi: ");
                 int pilihan = scanner.nextInt();
                 switch (pilihan) {
-                    case 1:
-                        System.out.print("Masukkan ID barang: ");
-                        String idBarang = scanner.next();
-                        System.out.print("Masukkan Nama barang: ");
-                        String namaBarang = scanner.next();
-                        double hargaBarang = 0.0;
-                        while (true) {
-                            try {
-                                System.out.print("Masukkan Harga barang: ");
-                                hargaBarang = scanner.nextDouble();
-                                break;
-                            } catch (InputMismatchException e) {
-                                System.out.println("Harga tidak valid. Masukkan angka.");
-                                scanner.next();
-                            }
+                                    case 1:
+                    System.out.print("Masukkan ID barang: ");
+                    String idBarang = scanner.next();
+                    System.out.print("Masukkan Nama barang: ");
+                    String namaBarang = scanner.next();
+                    double hargaBarang = 0.0;
+                    while (true) {
+                        try {
+                            System.out.print("Masukkan Harga barang: ");
+                            hargaBarang = scanner.nextDouble();
+                            break;
+                        } catch (InputMismatchException e) {
+                            System.out.println("Harga tidak valid. Masukkan angka.");
+                            scanner.next();
                         }
-                        Barang barang = new Barang(idBarang, namaBarang, hargaBarang);
-                        listBarang.tambahBarang(barang);
-                        System.out.println("Barang berhasil ditambahkan: " + barang);
-                        break;
+                    }
+                    int jumlahBarang = 0;
+                    while (true) {
+                        try {
+                            System.out.print("Masukkan Jumlah barang: ");
+                            jumlahBarang = scanner.nextInt();
+                            break;
+                        } catch (InputMismatchException e) {
+                            System.out.println("Jumlah tidak valid. Masukkan angka.");
+                            scanner.next();
+                        }
+                    }
+                    Barang barang = new Barang(idBarang, namaBarang, hargaBarang);
+                    barang.setJumlah(jumlahBarang); // Set the quantity
+                    listBarang.tambahBarang(barang);
+                    System.out.println("Barang berhasil ditambahkan: " + barang);
+                    break;
                     case 2:
                         System.out.print("Masukkan ID barang yang akan dihapus: ");
                         String idBarangHapus = scanner.next();
@@ -513,71 +533,102 @@ class CustomerDriver extends Driver {
         }
     }
 
+        private double calculateTotal() {
+            double total = 0;
+            for (Barang barang : akun.getBasket().getBarang()) {
+                total += barang.getHarga() * barang.getJumlah();
+            }
+            return total;
+        }
+
         @Override
         public void checkout() {
-            // Customer can checkout
-            try {
-                while (true) {
-                    System.out.println("\nKeranjang Belanja:");
-                    for (Barang barang : akun.getBasket().getBarang()) {
-                        System.out.println(barang);
-                    }
-                    System.out.println("\nMenu Checkout:");
-                    System.out.println("1. Proses Checkout");
-                    System.out.println("2. Batalkan Checkout");
-                    System.out.print("Pilih opsi: ");
-                    int pilihan = scanner.nextInt();
-                    switch (pilihan) {
-                        case 1:
-                            akun.getBasket().checkout();
-                            System.out.println("Checkout berhasil!");
-                            return; // Keluar dari metode jika pilihan adalah 1
-                        case 2:
-                            akun.getBasket().clear();
-                            System.out.println("Checkout dibatalkan. Keranjang belanja dikosongkan.");
-                            return; // Keluar dari metode jika pilihan adalah 2
-                        default:
-                            System.out.println("Pilihan tidak valid. Silakan coba lagi.");
-                            break;
-                    }
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Input tidak valid. Silakan coba lagi.");
-                scanner.nextLine(); // Consume the invalid input
-            }
-        }
-        @Override
-    public void pilihMetodePembayaran() {
         try {
-            System.out.println("\nMetode Pembayaran:");
-            System.out.println("1. QRIS");
-            System.out.println("2. Transfer Bank");
-            System.out.println("3. COD (Cash on Delivery)");
-            System.out.print("Pilih metode pembayaran (1-3): ");
-            int metodePembayaran = scanner.nextInt();
+            while (true) {
+                System.out.println("\nKeranjang Belanja:");
+                for (Barang barang : akun.getBasket().getBarang()) {
+                    System.out.println(barang);
+                }
+                System.out.println("\nMenu Checkout:");
+                System.out.println("1. Proses Checkout");
+                System.out.println("2. Batalkan Checkout");
+                System.out.print("Pilih opsi: ");
+                int pilihan = scanner.nextInt();
+                switch (pilihan) {
+                    case 1:
+                        double total = calculateTotal();
+                        System.out.println("Total Belanja: Rp " + total);
 
-            // Consume the newline character
-            scanner.nextLine();
+                        // Proceed to payment method selection
+                        pilihMetodePembayaran();
 
-            switch (metodePembayaran) {
-                case 1:
-                    akun.setPembayaran(new QRIS(generateRandomId()));
-                    break;
-                case 2:
-                    akun.setPembayaran(new Bank(generateRandomId()));
-                    break;
-                case 3:
-                    akun.setPembayaran(new COD(generateRandomId()));
-                    break;
-                default:
-                    System.out.println("Metode pembayaran tidak valid. Silakan coba lagi.");
-                    break;
+                        // Create a new Transaksi object
+                        Transaksi transaksi = new Transaksi(akun);
+                        transaksi.setBarang(akun.getBasket().getBarang());
+
+                        // Create a new Invoice object
+                        Invoice invoice = new Invoice(transaksi, akun.getPembayaran());
+
+                        // Print the invoice
+                        invoice.cetakInvoice();
+
+                        // Clear the basket after successful checkout
+                        akun.getBasket().clear();
+
+                        System.out.println("Checkout berhasil!");
+                        return; // Keluar dari metode jika pilihan adalah 1
+                    case 2:
+                        akun.getBasket().clear();
+                        System.out.println("Checkout dibatalkan. Keranjang belanja dikosongkan.");
+                        return; // Keluar dari metode jika pilihan adalah 2
+                    default:
+                        System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+                        break;
+                }
             }
-        } catch (NoSuchElementException e) {
+        } catch (InputMismatchException e) {
             System.out.println("Input tidak valid. Silakan coba lagi.");
             scanner.nextLine(); // Consume the invalid input
         }
     }
+
+
+        @Override
+        public void pilihMetodePembayaran() {
+            try {
+                System.out.println("\nMetode Pembayaran:");
+                System.out.println("1. QRIS");
+                System.out.println("2. Transfer Bank");
+                System.out.println("3. COD (Cash on Delivery)");
+                System.out.print("Pilih metode pembayaran (1-3): ");
+                int metodePembayaran = scanner.nextInt();
+
+                // Consume the newline character
+                scanner.nextLine();
+
+                switch (metodePembayaran) {
+                    case 1:
+                        akun.setPembayaran(new QRIS(generateRandomId()));
+                        System.out.println("Metode pembayaran berhasil dipilih: QRIS");
+                        break;
+                    case 2:
+                        akun.setPembayaran(new Bank(generateRandomId()));
+                        System.out.println("Metode pembayaran berhasil dipilih: Transfer Bank");
+                        break;
+                    case 3:
+                        akun.setPembayaran(new COD(generateRandomId()));
+                        System.out.println("Metode pembayaran berhasil dipilih: COD (Cash on Delivery)");
+                        break;
+                    default:
+                        System.out.println("Metode pembayaran tidak valid. Silakan coba lagi.");
+                        break;
+                }
+            } catch (NoSuchElementException e) {
+                System.out.println("Input tidak valid. Silakan coba lagi.");
+                scanner.nextLine(); // Consume the invalid input
+            }
+        }
+
 
 
     private String generateRandomId() {
@@ -660,7 +711,6 @@ public class Main {
             System.out.println("2. Beli Barang");
             System.out.println("3. Lihat List Barang");
             System.out.println("4. Checkout");
-            System.out.println("5. Pilih Metode Pembayaran");
             System.out.println("0. Logout");
 
             System.out.print("Masukkan pilihan: ");
@@ -678,9 +728,6 @@ public class Main {
                     break;
                 case 4:
                     driverAkun.checkout();
-                    break;
-                case 5:
-                    driverAkun.pilihMetodePembayaran();
                     break;
                 case 0:
                     userMenuRunning = false;
