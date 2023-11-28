@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 // Existing classes
@@ -398,8 +399,11 @@ class AdminDriver extends Driver {
     }
 }
 class CustomerDriver extends Driver {
-    public CustomerDriver(Akun akun, ListBarang listBarang) {
+    private Scanner scanner;
+    public CustomerDriver(Akun akun, ListBarang listBarang, Scanner scanner) {
         super(akun, listBarang);
+        this.scanner = scanner;
+
     }
 
     @Override
@@ -469,44 +473,37 @@ class CustomerDriver extends Driver {
             scanner.nextLine(); // Consume the invalid input
         }
     }
-    @Override
-public void beliBarang() {
-    try (Scanner scanner = new Scanner(System.in)) {
-        while (true) {
-            System.out.println("\nList Barang:");
-            for (Barang barang : listBarang.getBarang()) {
-                System.out.println(barang);
+       @Override
+        public void beliBarang() {
+        // Add the provided code here
+        if (listBarang == null) {
+            System.out.println("Error: listBarang is null");
+            return;
+        }
+
+        if (akun == null) {
+            System.out.println("Error: akun is null");
+            return;
+        }
+
+        System.out.print("Masukkan ID barang yang akan dibeli: ");
+        String idBarangBeli = scanner.next();
+        Barang barangBeli = listBarang.cariBarangById(idBarangBeli);
+
+        if (barangBeli != null) {
+            ListBarang basket = akun.getBasket();
+            if (basket != null) {
+                basket.tambahBarang(barangBeli);
+                System.out.println("Barang berhasil ditambahkan ke keranjang.");
+            } else {
+                System.out.println("Error: Basket is null");
             }
-            System.out.println("\nMenu Beli Barang:");
-            System.out.println("1. Tambah Barang ke Keranjang");
-            System.out.println("2. Checkout");
-            System.out.println("0. Kembali");
-            System.out.print("Pilih opsi: ");
-            int pilihan = scanner.nextInt();
-            switch (pilihan) {
-                case 1:
-                    System.out.print("Masukkan ID barang yang akan dibeli: ");
-                    String idBarangBeli = scanner.next();
-                    Barang barangBeli = listBarang.cariBarangById(idBarangBeli);
-                    if (barangBeli != null) {
-                        akun.getBasket().tambahBarang(barangBeli);
-                        System.out.println("Barang berhasil ditambahkan ke keranjang.");
-                    } else {
-                        System.out.println("Barang dengan ID " + idBarangBeli + " tidak ditemukan.");
-                    }
-                    break;
-                case 2:
-                    akun.getBasket().checkout();
-                    return; // Keluar dari metode jika pilihan adalah 2
-                case 0:
-                    return; // Keluar dari metode jika pilihan adalah 0
-                default:
-                    System.out.println("Pilihan tidak valid. Silakan coba lagi.");
-                    break;
-            }
+        } else {
+            System.out.println("Barang dengan ID " + idBarangBeli + " tidak ditemukan.");
         }
     }
-}
+
+
     @Override
     public void lihatListBarang() {
         // Customer can view the list of items
@@ -516,47 +513,52 @@ public void beliBarang() {
         }
     }
 
-    @Override
-    public void checkout() {
-        // Customer can checkout
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (true) {
-                System.out.println("\nKeranjang Belanja:");
-                for (Barang barang : akun.getBasket().getBarang()) {
-                    System.out.println(barang);
+        @Override
+        public void checkout() {
+            // Customer can checkout
+            try {
+                while (true) {
+                    System.out.println("\nKeranjang Belanja:");
+                    for (Barang barang : akun.getBasket().getBarang()) {
+                        System.out.println(barang);
+                    }
+                    System.out.println("\nMenu Checkout:");
+                    System.out.println("1. Proses Checkout");
+                    System.out.println("2. Batalkan Checkout");
+                    System.out.print("Pilih opsi: ");
+                    int pilihan = scanner.nextInt();
+                    switch (pilihan) {
+                        case 1:
+                            akun.getBasket().checkout();
+                            System.out.println("Checkout berhasil!");
+                            return; // Keluar dari metode jika pilihan adalah 1
+                        case 2:
+                            akun.getBasket().clear();
+                            System.out.println("Checkout dibatalkan. Keranjang belanja dikosongkan.");
+                            return; // Keluar dari metode jika pilihan adalah 2
+                        default:
+                            System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+                            break;
+                    }
                 }
-                System.out.println("\nMenu Checkout:");
-                System.out.println("1. Proses Checkout");
-                System.out.println("2. Batalkan Checkout");
-                System.out.print("Pilih opsi: ");
-                int pilihan = scanner.nextInt();
-                switch (pilihan) {
-                    case 1:
-                        akun.getBasket().checkout();
-                        System.out.println("Checkout berhasil!");
-                        return; // Keluar dari metode jika pilihan adalah 1
-                    case 2:
-                        akun.getBasket().clear();
-                        System.out.println("Checkout dibatalkan. Keranjang belanja dikosongkan.");
-                        return; // Keluar dari metode jika pilihan adalah 2
-                    default:
-                        System.out.println("Pilihan tidak valid. Silakan coba lagi.");
-                        break;
-                }
+            } catch (InputMismatchException e) {
+                System.out.println("Input tidak valid. Silakan coba lagi.");
+                scanner.nextLine(); // Consume the invalid input
             }
         }
-    }
-
-    @Override
+        @Override
     public void pilihMetodePembayaran() {
-        // Customer can choose a payment method
-        try (Scanner scanner = new Scanner(System.in)) {
+        try {
             System.out.println("\nMetode Pembayaran:");
             System.out.println("1. QRIS");
             System.out.println("2. Transfer Bank");
             System.out.println("3. COD (Cash on Delivery)");
             System.out.print("Pilih metode pembayaran (1-3): ");
             int metodePembayaran = scanner.nextInt();
+
+            // Consume the newline character
+            scanner.nextLine();
+
             switch (metodePembayaran) {
                 case 1:
                     akun.setPembayaran(new QRIS(generateRandomId()));
@@ -571,8 +573,12 @@ public void beliBarang() {
                     System.out.println("Metode pembayaran tidak valid. Silakan coba lagi.");
                     break;
             }
+        } catch (NoSuchElementException e) {
+            System.out.println("Input tidak valid. Silakan coba lagi.");
+            scanner.nextLine(); // Consume the invalid input
         }
     }
+
 
     private String generateRandomId() {
         return String.valueOf((int) (Math.random() * 1000000));
@@ -636,15 +642,16 @@ public class Main {
         String id = scanner.next();
         System.out.print("Masukkan Nama Customer: ");
         String nama = scanner.next();
-
+    
         System.out.println("Login berhasil!");
         akun = new Customer(id, nama);
-        driverAkun = new CustomerDriver((Customer) akun, listBarang);
-
+        driverAkun = new CustomerDriver((Customer) akun, listBarang, scanner);
+    
         // Directly enter the Customer menu
         userMenu();
     }
-
+    
+    
     private static void userMenu() {
         boolean userMenuRunning = true;
         while (userMenuRunning) {
