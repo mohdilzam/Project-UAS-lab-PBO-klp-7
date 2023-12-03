@@ -4,18 +4,17 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-// Existing classes
 class Barang {
     private String id;
     private String nama;
     private double harga;
-    private int jumlah; // Added field for quantity
+    private int jumlah;
 
     public Barang(String id, String nama, double harga, int jumlahBarang) {
         this.id = id;
         this.nama = nama;
         this.harga = harga;
-        this.jumlah = jumlahBarang; // Default quantity is set to 0
+        this.jumlah = jumlahBarang;
     }
 
     public String getId() {
@@ -60,7 +59,7 @@ class Barang {
 
 class ListBarang {
     private List<Barang> listBarang;
-    private List<Transaksi> listTransaksi; // Add a list to store transactions
+    private List<Transaksi> listTransaksi;
 
     public ListBarang() {
         this.listBarang = new ArrayList<>();
@@ -108,14 +107,11 @@ class ListBarang {
     }
 
     public void checkout() {
-        // Implementation for checkout logic
     }
 
     public void clear() {
         listBarang.clear();
     }
-
-    // New methods for managing transactions
 
     public List<Transaksi> getTransaksi() {
         return listTransaksi;
@@ -260,12 +256,10 @@ abstract class Akun {
     public abstract void setPembayaran(Pembayaran pembayaran);
 
     public void login() {
-        // Implementasi login
         System.out.println("Login as: " + getNama());
     }
 
     public ListBarang getBasket() {
-        // Return the basket for the user (Customer)
         return null;
     }
 }
@@ -285,7 +279,6 @@ class Customer extends Akun {
     @Override
     public void setPembayaran(Pembayaran pembayaran) {
         this.pembayaran = pembayaran;
-        // Implementasi untuk Customer
     }
     
 }
@@ -298,11 +291,8 @@ class Admin extends Akun {
     @Override
     public void setPembayaran(Pembayaran pembayaran) {
         this.pembayaran = pembayaran;
-        // Implementasi untuk Admin
     }
 }
-
-// New classes
 
 class Keranjang {
     private List<Barang> barang;
@@ -398,7 +388,7 @@ class AdminDriver extends Driver {
                         }
                     }
                     Barang barang = new Barang(idBarang, namaBarang, hargaBarang, jumlahBarang);
-                    barang.setJumlah(jumlahBarang); // Set the quantity
+                    barang.setJumlah(jumlahBarang);
                     listBarang.tambahBarang(barang);
                     System.out.println("Barang berhasil ditambahkan: " + barang);
                     break;
@@ -429,7 +419,7 @@ class AdminDriver extends Driver {
                         }
                         break;
                     case 0:
-                        return; // Keluar dari metode jika pilihan adalah 0
+                        return;
                     default:
                         System.out.println("Pilihan tidak valid. Silakan coba lagi.");
                         break;
@@ -437,19 +427,17 @@ class AdminDriver extends Driver {
             }
         }catch (InputMismatchException e) {
             System.out.println("Input tidak valid. Silakan coba lagi.");
-            scanner.nextLine(); // Consume the invalid input
+            scanner.nextLine();
         }
     }
 
     @Override
     public void beliBarang() {
-        // Admin cannot buy items
         System.out.println("Admin tidak dapat melakukan pembelian.");
     }
 
     @Override
     public void lihatListBarang() {
-        // Admin can view the list of items
         System.out.println("\nList Barang:");
         for (Barang barang : listBarang.getBarang()) {
             System.out.println(barang);
@@ -458,47 +446,40 @@ class AdminDriver extends Driver {
 
     @Override
     public void checkout() {
-        // Admin cannot checkout
         System.out.println("Admin tidak dapat melakukan checkout.");
     }
 
     @Override
     public void pilihMetodePembayaran() {
-        // Admin cannot choose a payment method
         System.out.println("Admin tidak dapat memilih metode pembayaran.");
     }
         
     public void setujuCheckout() {
-        if (listBarang == null) {
-            System.out.println("Error: listBarang is null");
-            return;
-        }
+    if (listBarang == null || listBarang.getTransaksi() == null) {
+        System.out.println("Error: listBarang or transactions list is null");
+        return;
+    }
 
-        // Menampilkan transaksi yang menunggu persetujuan
-        System.out.println("\nTransaksi Menunggu Persetujuan:");
-        for (Transaksi transaksi : listBarang.getTransaksi()) {
-            if (!transaksi.getStatus()) {
-                System.out.println("Transaksi ID: " + transaksi.hashCode());
-                System.out.println("Total Belanja: Rp " + calculateTotal(transaksi));
-            }
-        }
-
-        // Meminta input ID transaksi yang akan disetujui
-        System.out.print("Masukkan ID Transaksi yang akan disetujui: ");
-        int idTransaksi = scanner.nextInt();
-
-        // Find the transaction in the basket
-        Transaksi transaksi = akun.getBasket().cariTransaksiById(idTransaksi);
-
-        // Check if the transaction is found and not already approved
-        if (transaksi != null && !transaksi.getStatus()) {
-            // Set the status to true
-            transaksi.setStatus(true);
-            System.out.println("Transaksi berhasil disetujui.");
-        } else {
-            System.out.println("Transaksi dengan ID " + idTransaksi + " tidak ditemukan atau sudah disetujui.");
+    System.out.println("\nTransaksi Menunggu Persetujuan:");
+    for (Transaksi transaksi : listBarang.getTransaksi()) {
+        if (!transaksi.getStatus()) {
+            System.out.println("Transaksi ID: " + transaksi.hashCode());
+            System.out.println("Total Belanja: Rp " + calculateTotal(transaksi));
         }
     }
+
+    System.out.print("Masukkan ID Transaksi yang akan disetujui: ");
+    int idTransaksi = scanner.nextInt();
+
+    Transaksi transaksi = listBarang.cariTransaksiById(idTransaksi);
+
+    if (transaksi != null && !transaksi.getStatus()) {
+    transaksi.setStatus(true);
+    System.out.println("Transaksi berhasil disetujui.");
+    } else {
+        System.out.println("Transaksi berhasil disetujui.");
+    }
+}
 
     private double calculateTotal(Transaksi transaksi) {
         double total = 0;
@@ -573,7 +554,7 @@ class CustomerDriver extends Driver {
                         }
                         break;
                     case 0:
-                        return; // Keluar dari metode jika pilihan adalah 0
+                        return;
                     default:
                         System.out.println("Pilihan tidak valid. Silakan coba lagi.");
                         break;
@@ -581,12 +562,11 @@ class CustomerDriver extends Driver {
             }
         } catch (InputMismatchException e) {
             System.out.println("Input tidak valid. Silakan coba lagi.");
-            scanner.nextLine(); // Consume the invalid input
+            scanner.nextLine();
         }
     }
         @Override
     public void beliBarang() {
-        // Add the provided code here
         if (listBarang == null) {
             System.out.println("Error: listBarang is null");
             return;
@@ -602,8 +582,6 @@ class CustomerDriver extends Driver {
         Barang barangBeli = listBarang.cariBarangById(idBarangBeli);
 
         if (barangBeli != null) {
-            // Here, you can choose whether to add the item to the basket or not.
-            // For example, you can ask the user if they want to add it to the basket.
             System.out.print("Apakah Anda ingin menambahkan barang ke keranjang? (y/n): ");
             String addToBasketChoice = scanner.next().toLowerCase();
 
@@ -626,7 +604,6 @@ class CustomerDriver extends Driver {
 
     @Override
     public void lihatListBarang() {
-        // Customer can view the list of items
         System.out.println("\nList Barang:");
         listBarang.displayAsTable();
     }
@@ -656,39 +633,39 @@ class CustomerDriver extends Driver {
                         double total = calculateTotal();
                         System.out.println("Total Belanja: Rp " + total);
 
-                        // Meminta persetujuan admin
                         System.out.print("Apakah Anda ingin melanjutkan dengan checkout? (y/n): ");
                         String approvalChoice = scanner.next().toLowerCase();
 
                         if (approvalChoice.equals("y")) {
-                            // Set status transaksi menjadi disetujui
-                            akun.getBasket().getTransaksi().setStatus(true);
+                            if (!akun.getBasket().getTransaksi().isEmpty()) {
+                            Transaksi transaksi = akun.getBasket().getTransaksi().get(0);
+                            transaksi.setStatus(true);
+                            System.out.println("Transaksi berhasil disetujui.");
+                        } else {
+                            System.out.println("Tidak ada transaksi dalam keranjang.");
+                        }
 
-                            // Melanjutkan ke proses pembayaran
                             pilihMetodePembayaran();
 
-                            // Create a new Transaksi object
                             Transaksi transaksi = new Transaksi(akun);
                             transaksi.setBarang(akun.getBasket().getBarang());
 
-                            // Create a new Invoice object
+                        
                             Invoice invoice = new Invoice(transaksi, akun.getPembayaran());
 
-                            // Print the invoice
                             invoice.cetakInvoice();
 
-                            // Clear the basket after successful checkout
                             akun.getBasket().clear();
 
                             System.out.println("Checkout berhasil!");
                         } else {
                             System.out.println("Checkout dibatalkan.");
                         }
-                        return; // Keluar dari metode jika pilihan adalah 1
+                        return;
                     case 2:
                         akun.getBasket().clear();
                         System.out.println("Checkout dibatalkan. Keranjang belanja dikosongkan.");
-                        return; // Keluar dari metode jika pilihan adalah 2
+                        return;
                     default:
                         System.out.println("Pilihan tidak valid. Silakan coba lagi.");
                         break;
@@ -696,10 +673,9 @@ class CustomerDriver extends Driver {
             }
         } catch (InputMismatchException e) {
             System.out.println("Input tidak valid. Silakan coba lagi.");
-            scanner.nextLine(); // Consume the invalid input
+            scanner.nextLine();
         }
     }
-
 
         @Override
         public void pilihMetodePembayaran() {
@@ -711,7 +687,6 @@ class CustomerDriver extends Driver {
                 System.out.print("Pilih metode pembayaran (1-3): ");
                 int metodePembayaran = scanner.nextInt();
 
-                // Consume the newline character
                 scanner.nextLine();
 
                 switch (metodePembayaran) {
@@ -733,7 +708,7 @@ class CustomerDriver extends Driver {
                 }
             } catch (NoSuchElementException e) {
                 System.out.println("Input tidak valid. Silakan coba lagi.");
-                scanner.nextLine(); // Consume the invalid input
+                scanner.nextLine();
             }
         }
     private String generateRandomId() {
@@ -744,13 +719,11 @@ class CustomerDriver extends Driver {
     List<Transaksi> transaksiList = akun.getBasket().getTransaksi();
 
     if (!transaksiList.isEmpty()) {
-        Transaksi transaksi = transaksiList.get(0); // You might need to specify the index
+        Transaksi transaksi = transaksiList.get(0);
 
         if (transaksi != null && transaksi.getStatus()) {
-            // Create a new Invoice object
             Invoice invoice = new Invoice(transaksi, akun.getPembayaran());
 
-            // Print the invoice
             invoice.cetakInvoice();
         } else {
             System.out.println("Tidak ada transaksi yang telah disetujui.");
@@ -773,8 +746,8 @@ public class Main {
 
         while (running) {
             System.out.println("\nMenu:");
-            System.out.println("1. Login as Admin");
-            System.out.println("2. Login as Customer");
+            System.out.println("1. Login sebagai Admin");
+            System.out.println("2. Login sebagai Customer");
             System.out.println("3. Exit");
 
             System.out.print("Masukkan pilihan: ");
@@ -797,22 +770,20 @@ public class Main {
         }
 
         System.out.println("Terima kasih! Program selesai.");
-        scanner.close(); // Close the Scanner when the program is finished
+        scanner.close();
     }
         
     private static void loginAsAdmin() {
-        System.out.print("Masukkan ID Admin: "); // ID Admin : 000
+        System.out.print("Masukkan ID Admin: ");
         String id = scanner.next();
-        System.out.print("Masukkan Password Admin: "); // Password Admin : Admin
+        System.out.print("Masukkan Password Admin: ");
         String password = scanner.next();
     
-        // Verifikasi ID dan password Admin
         if (id.equals("000") && password.equals("Admin")) {
             System.out.println("Login berhasil!");
             akun = new Admin(id, "Admin");
             driverAkun = new AdminDriver((Admin) akun, listBarang, scanner);
     
-            // Masuk ke menu Admin
             adminMenu();
         } else {
             System.out.println("ID atau Password salah, silahkan coba lagi!");
@@ -820,18 +791,16 @@ public class Main {
     }
     
     private static void loginAsCustomer() {
-        System.out.print("Masukkan ID Customer: "); // ID Customer : 001
+        System.out.print("Masukkan ID Customer: ");
         String id = scanner.next();
-        System.out.print("Masukkan Password Customer: "); //Password Customer : Customer
+        System.out.print("Masukkan Password Customer: ");
         String password = scanner.next();
     
-        // Verifikasi ID dan password Customer
         if (id.equals("001") && password.equals("Customer")) {
             System.out.println("Login berhasil!");
             akun = new Customer(id, "Customer");
             driverAkun = new CustomerDriver((Customer) akun, listBarang, scanner);
     
-            // Masuk ke menu Customer
             userMenu();
         } else {
             System.out.println("ID atau Password salah, silahkan coba lagi!");
@@ -865,7 +834,7 @@ public class Main {
                     break;
                 case 4:
                     driverAkun.checkout();
-                    akun = null; // Move this line after the checkout process
+                    akun = null;
                     break;
                 case 5:
                     ((CustomerDriver) driverAkun).lihatInvoice();
