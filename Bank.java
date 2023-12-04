@@ -1,7 +1,7 @@
 import java.util.*;
 
 /**
- * Kelas Bank merupakan implementasi dari antarmuka Pembayaran untuk representasi pembayaran melalui bank.
+ * Kelas Bank merupakan implementasi dari interface Pembayaran untuk representasi pembayaran melalui bank.
  */
 class Bank implements Pembayaran {
     /**
