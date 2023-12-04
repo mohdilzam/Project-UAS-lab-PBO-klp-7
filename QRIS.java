@@ -1,5 +1,5 @@
 /**
- * Kelas QRIS adalah implementasi dari antarmuka Pembayaran untuk metode pembayaran menggunakan QRIS.
+ * Kelas QRIS adalah implementasi dari interface Pembayaran untuk metode pembayaran menggunakan QRIS.
  * Setiap objek QRIS memiliki identifikasi yang dapat diakses dengan menggunakan metode getId().
  */
 class QRIS implements Pembayaran {
