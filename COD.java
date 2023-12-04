@@ -1,5 +1,5 @@
 /**
- * Kelas COD (Cash On Delivery) merupakan implementasi dari antarmuka Pembayaran untuk representasi pembayaran
+ * Kelas COD (Cash On Delivery) merupakan implementasi dari interface Pembayaran untuk representasi pembayaran
  * dengan metode Cash On Delivery.
  */
 class COD implements Pembayaran {
